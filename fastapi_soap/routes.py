@@ -51,16 +51,17 @@ class SoapRoute(APIRoute):
 class SoapRouter(APIRouter):
     """Custom Router to create Soap WebServices."""
 
-    def __init__(self, *args, name: str, **kwargs) -> None:
+    def __init__(self, *args, name: str, api_gateway_url: str = None, **kwargs) -> None:
         """
         Attrs:
             name (str): WebService Name
-            prefix (str): FastAPI base path for the webservice
+            prefix (str): FastAPI path for the webservice
+            api_gateway_url (str): Custom api gateway url for the webservice
             kwargs (dict): All FastAPI APIRouter parameters
 
         Example:
         ```
-        soap = SoapRouter(name="CalculatorWebService", prefix="/Calculator")
+        soap = SoapRouter(name="CalculatorWebService", prefix="/Calculator", api_gateway_url="http://localhost:8000")
         ```
         ---
 
@@ -81,6 +82,7 @@ class SoapRouter(APIRouter):
         self._responses = set()
 
         self._name = name
+        self.api_gateway_url = api_gateway_url
 
         self._methods = {}
         self.add_api_route(
@@ -88,7 +90,7 @@ class SoapRouter(APIRouter):
         )
 
     def _generate_wsdl(self, request: Request):
-        wsdl = generate_wsdl(self._name, self._methods, url=self.prefix, request=request)
+        wsdl = generate_wsdl(self._name, self._methods, api_gateway_url=self.api_gateway_url, request=request)
         return SoapResponse(dump_etree(wsdl), envelope_wrap=False)
 
     def operation(

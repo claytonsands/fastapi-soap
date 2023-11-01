@@ -32,6 +32,7 @@ pydantic = "<3"
 lxml = "^4.9.2"
 pydantic-xml = {extras = ["lxml"], version = "^0.6.0"}
 fastapi = "^0.95.0"
+uvicorn = "^0.23.2"
 
 
 [tool.poetry.group.dev.dependencies]

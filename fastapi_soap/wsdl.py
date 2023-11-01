@@ -100,7 +100,7 @@ def dump_etree(element: Element) -> str:
 
 
 def generate_wsdl(
-    name: str, methods, url: str, request: Request, documentation: str = ''
+    name: str, methods, api_gateway_url: str, request: Request, documentation: str = ''
 ) -> Element:
     wsdl = Element('wsdl:definitions', nsmap, name=name)
     SubElement(wsdl, 'wsdl:documentation').text = documentation
@@ -137,10 +137,18 @@ def generate_wsdl(
         port_element = SubElement(
             service_element, 'wsdl:port', name=method_name, binding=method_name
         )
+
+        path = request.url.path.strip("/")
+
+        if api_gateway_url is not None:
+            url = api_gateway_url
+        else:
+            url = str(request.url.replace(query="", fragment="", path="")).rstrip("/")
+
         SubElement(
             port_element,
             'soap:address',
-            location=f'{str(request.url.replace(query="", fragment="")).rstrip("/")}/{method}',
+            location=f'{url}/{path}/{method}',
         )
 
         for action, model in models.items():
